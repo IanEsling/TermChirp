@@ -13,13 +13,14 @@ public class ConsoleTweetTest {
 
     Scanner scanner;
     @Mock
-    CommandRunner commandRunner;
+    CommandInterpreter commandInterpreter;
 
     @Test
     public void getCommands(){
-        scanner = new Scanner(new StringReader("string0 string1 string2"));
-        ConsoleReader testee = new ConsoleReader(scanner, commandRunner);
-        verify(commandRunner).command("string0", "string1", "string2");
+        StringReader source = new StringReader("string0 string1 string2");
+        scanner = new Scanner(source);
+        ConsoleReader testee = new ConsoleReader(scanner, commandInterpreter);
+        verify(commandInterpreter).command("string0", "string1", "string2");
     }
 
 }
