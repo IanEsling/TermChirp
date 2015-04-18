@@ -3,8 +3,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.org.fyodor.generators.Generator;
-import uk.org.fyodor.generators.RDG;
-import uk.org.fyodor.range.Range;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -17,9 +15,9 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class ConsoleReaderTest {
 
-    Generator<String> spacesGenerator = RDG.string(Range.closed(1, 10), " ");
-    Generator<String> userNameGenerator = RDG.string(Range.closed(5, 15));
-    Generator<String> messageGenerator = RDG.string(Range.closed(25, 150), Range.closed(32, 126));
+    Generator<String> spacesGenerator = TermChirpRDG.spacesGenerator;
+    Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
+    Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
 
     @Mock
     PrintStream output;
@@ -74,8 +72,8 @@ public class ConsoleReaderTest {
 
     private InputStream getUserInputAsStream(String userName, String command, String message) {
         return new ByteArrayInputStream((userName +
-                (command!=null ? spacesGenerator.next() + command : "") +
-                (message!=null ? spacesGenerator.next() + message : ""))
+                (command != null ? spacesGenerator.next() + command : "") +
+                (message != null ? spacesGenerator.next() + message : ""))
                 .getBytes());
     }
 }
