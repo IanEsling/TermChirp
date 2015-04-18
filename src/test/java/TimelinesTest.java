@@ -1,8 +1,10 @@
+import org.junit.Before;
 import org.junit.Test;
 import uk.org.fyodor.generators.Generator;
 import uk.org.fyodor.generators.RDG;
 import uk.org.fyodor.range.Range;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -10,10 +12,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TimelinesTest {
 
+    LocalDateTime now = LocalDateTime.now();
     Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
     Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
 
-    Timelines timelines = new Timelines();
+    Clock clock;
+    ChirpGenerator chirpGenerator;
+    Timelines timelines;
+
+    @Before
+    public void setupTimelines(){
+        clock = new TestClock(now);
+        chirpGenerator = new ChirpGenerator(clock);
+        timelines = new Timelines(chirpGenerator);
+    }
 
     @Test
     public void createTimelineForFirstPost(){
@@ -22,7 +34,7 @@ public class TimelinesTest {
         assertThat(timelines.getTimelineForUser(userName)).hasSize(0);
         timelines.addToTimeline(userName, message);
         assertThat(timelines.getTimelineForUser(userName)).hasSize(1);
-        assertThat(timelines.getTimelineForUser(userName).iterator().next()).isEqualTo(message);
+        assertThat(timelines.getTimelineForUser(userName).iterator().next().getMessage()).isEqualTo(message);
     }
 
     @Test
@@ -35,8 +47,8 @@ public class TimelinesTest {
             postedMessages.add(message);
             timelines.addToTimeline(userName, message);
         }
-        for (String message : timelines.getTimelineForUser(userName)) {
-            assertThat(postedMessages).contains(message);
+        for (Chirp chirp : timelines.getTimelineForUser(userName)) {
+            assertThat(postedMessages).contains(chirp.getMessage());
         }
         assertThat(timelines.getTimelineForUser(userName)).hasSize(numberOfMessagesToPost);
     }

@@ -25,4 +25,8 @@ public class Chirp {
                 prettyTime.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())) +
                 ")";
     }
+
+    public String getMessage() {
+        return message;
+    }
 }

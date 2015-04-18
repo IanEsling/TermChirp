@@ -30,4 +30,11 @@ public class MessageRepositoryTest {
         repo.command(userName, Command.POST_INPUT, message);
         verify(timelines).addToTimeline(userName, message);
     }
+
+    @Test
+    public void userCanReadOtherUsersTimeline() {
+        String userName = userNameGenerator.next();
+        repo.command(userName, null, null);
+        verify(timelines).getTimelineForUser(userName);
+    }
 }

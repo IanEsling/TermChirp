@@ -10,6 +10,8 @@ public class MessageRepository {
     public String command(String userName, String command, String message) {
         if (Command.POST_INPUT.equals(command)) {
             timelines.addToTimeline(userName, message);
+        } else if (command == null) {
+            timelines.getTimelineForUser(userName);
         }
 
         return "";
