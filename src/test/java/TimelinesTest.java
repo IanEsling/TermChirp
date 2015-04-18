@@ -1,5 +1,10 @@
 import org.junit.Test;
 import uk.org.fyodor.generators.Generator;
+import uk.org.fyodor.generators.RDG;
+import uk.org.fyodor.range.Range;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,12 +26,19 @@ public class TimelinesTest {
     }
 
     @Test
-    public void addConsecutivePosts(){
+    public void addThenReadPosts(){
         String userName = userNameGenerator.next();
-        timelines.addToTimeline(userName, messageGenerator.next());
-        timelines.addToTimeline(userName, messageGenerator.next());
-        timelines.addToTimeline(userName, messageGenerator.next());
-        timelines.addToTimeline(userName, messageGenerator.next());
-        assertThat(timelines.getTimelineForUser(userName)).hasSize(4);
+        Integer numberOfMessagesToPost = RDG.integer(Range.closed(5, 50)).next();
+        Collection<String> postedMessages = new ArrayList<>(numberOfMessagesToPost);
+        for (int i = 0; i < numberOfMessagesToPost; i++) {
+            String message = messageGenerator.next();
+            postedMessages.add(message);
+            timelines.addToTimeline(userName, message);
+        }
+        for (String message : timelines.getTimelineForUser(userName)) {
+            assertThat(postedMessages).contains(message);
+        }
+        assertThat(timelines.getTimelineForUser(userName)).hasSize(numberOfMessagesToPost);
     }
+
 }
