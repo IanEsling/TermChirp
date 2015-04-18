@@ -8,6 +8,10 @@ public class TestClock implements Clock {
         this.now = now;
     }
 
+    public void setNow(LocalDateTime newNow) {
+        this.now = newNow;
+    }
+
     @Override
     public LocalDateTime now() {
         return now;
