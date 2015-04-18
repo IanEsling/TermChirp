@@ -1,5 +1,6 @@
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Scanner;
 
 public class ConsoleReader {
@@ -21,7 +22,7 @@ public class ConsoleReader {
         while (runs < runTimes) {
             String[] command = getInput(scanner);
             runs++;
-            String out = messageRepository.command(command[0], command[1], command[2]);
+            Collection<Chirp> out = messageRepository.command(command[0], command[1], command[2]);
             output.println(out);
         }
     }

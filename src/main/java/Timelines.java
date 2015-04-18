@@ -20,7 +20,7 @@ public class Timelines {
         }
     }
 
-    public Iterable<Chirp> getTimelineForUser(String userName) {
+    public Collection<Chirp> getTimelineForUser(String userName) {
 
         if (timelines.containsKey(userName)) {
             return timelines.get(userName);

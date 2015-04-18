@@ -3,10 +3,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.org.fyodor.generators.Generator;
+import uk.org.fyodor.range.Range;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
@@ -18,6 +21,8 @@ public class ConsoleReaderTest {
     Generator<String> spacesGenerator = TermChirpRDG.spacesGenerator;
     Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
     Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
+    Generator<Chirp> chirpGenerator = TermChirpRDG.chirpGenerator();
+    Collection<Chirp> emptyChirps = new ArrayList<>();
 
     @Mock
     PrintStream output;
@@ -27,47 +32,52 @@ public class ConsoleReaderTest {
     @Test
     public void getPostCommand() {
         given(messageRepository.command(anyString(), anyString(), anyString()))
-                .willReturn("");
+                .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
         InputStream input = getUserInputAsStream(userName, Command.POST_INPUT, message);
         new ConsoleReader(input, output, messageRepository, 1d);
         verify(messageRepository).command(userName, Command.POST_INPUT, message);
-        verify(output).println("");
+        verify(output).println(emptyChirps);
     }
 
     @Test
     public void getFollowsCommand() {
         given(messageRepository.command(anyString(), anyString(), anyString()))
-                .willReturn("");
+                .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         String message = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, Command.FOLLOWS_INPUT, message);
         new ConsoleReader(input, output, messageRepository, 1d);
         verify(messageRepository).command(userName, Command.FOLLOWS_INPUT, message);
-        verify(output).println("");
+        verify(output).println(emptyChirps);
     }
 
     @Test
     public void getWallCommand() {
         given(messageRepository.command(anyString(), anyString(), anyString()))
-                .willReturn("");
+                .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, Command.WALL_INPUT, null);
         new ConsoleReader(input, output, messageRepository, 1d);
         verify(messageRepository).command(eq(userName), eq(Command.WALL_INPUT), isNull(String.class));
-        verify(output).println("");
+        verify(output).println(emptyChirps);
     }
 
     @Test
     public void getReadingCommand() {
+        Collection<Chirp> chirps = collectionOfChirps(Range.closed(10, 30));
         given(messageRepository.command(anyString(), anyString(), anyString()))
-                .willReturn("");
+                .willReturn(chirps);
         String userName = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, null, null);
         new ConsoleReader(input, output, messageRepository, 1d);
         verify(messageRepository).command(eq(userName), isNull(String.class), isNull(String.class));
-        verify(output).println("");
+        verify(output).println(chirps);
+    }
+
+    private Collection<Chirp> collectionOfChirps(Range<Integer> range) {
+        return TermChirpRDG.list(chirpGenerator, range).next();
     }
 
     private InputStream getUserInputAsStream(String userName, String command, String message) {

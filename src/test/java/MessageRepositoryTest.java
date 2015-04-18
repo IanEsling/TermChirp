@@ -5,6 +5,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.org.fyodor.generators.Generator;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -24,17 +30,28 @@ public class MessageRepositoryTest {
     }
 
     @Test
-    public void userCanPostToTimeline() {
+    public void userCanPostToTimelineAndEmptySetReturned() {
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
-        repo.command(userName, Command.POST_INPUT, message);
+        Collection<Chirp> chirps = repo.command(userName, Command.POST_INPUT, message);
         verify(timelines).addToTimeline(userName, message);
     }
 
     @Test
     public void userCanReadOtherUsersTimeline() {
+        Collection<Chirp> randomListOfRandomChirps = TermChirpRDG.generatorOfListOfChirps().next();
+        given(timelines.getTimelineForUser(anyString()))
+                .willReturn(randomListOfRandomChirps);
         String userName = userNameGenerator.next();
-        repo.command(userName, null, null);
+        Collection<Chirp> chirps = repo.command(userName, null, null);
         verify(timelines).getTimelineForUser(userName);
+        
+        assertThat(chirps.size()).isEqualTo(randomListOfRandomChirps.size());
+        assertThat(chirps).isNotEqualTo(randomListOfRandomChirps);
+        LocalDateTime earliest = LocalDateTime.now();
+        for (Chirp chirp : chirps) {
+            assertThat(chirp.getDateTime()).isBefore(earliest);
+            earliest = chirp.getDateTime();
+        }
     }
 }
