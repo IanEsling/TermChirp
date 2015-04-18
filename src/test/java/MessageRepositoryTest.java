@@ -6,7 +6,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.org.fyodor.generators.Generator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -21,6 +23,7 @@ public class MessageRepositoryTest {
 
     Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
     Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
+    private Generator<List<Chirp>> chirpListGenerator = TermChirpRDG.generatorOfListOfChirps();
 
     MessageRepository repo;
 
@@ -35,17 +38,26 @@ public class MessageRepositoryTest {
         String message = messageGenerator.next();
         Collection<Chirp> chirps = repo.command(userName, Command.POST_INPUT, message);
         verify(timelines).addToTimeline(userName, message);
+        assertThat(chirps.size()).isEqualTo(0);
     }
 
     @Test
     public void userCanReadOtherUsersTimeline() {
-        Collection<Chirp> randomListOfRandomChirps = TermChirpRDG.generatorOfListOfChirps().next();
+        given(timelines.getTimelineForUser(anyString()))
+                .willReturn(new ArrayList<>());
+        String userName = userNameGenerator.next();
+        repo.command(userName, null, null);
+        verify(timelines).getTimelineForUser(userName);
+    }
+
+    @Test
+    public void otherUserTimelinesAreInChronologicalOrder(){
+        Collection<Chirp> randomListOfRandomChirps = chirpListGenerator.next();
         given(timelines.getTimelineForUser(anyString()))
                 .willReturn(randomListOfRandomChirps);
         String userName = userNameGenerator.next();
         Collection<Chirp> chirps = repo.command(userName, null, null);
-        verify(timelines).getTimelineForUser(userName);
-        
+
         assertThat(chirps.size()).isEqualTo(randomListOfRandomChirps.size());
         assertThat(chirps).isNotEqualTo(randomListOfRandomChirps);
         LocalDateTime earliest = LocalDateTime.now();
