@@ -4,6 +4,7 @@ public class Main {
 
 
     public static void main(String... args) {
+        new ConsoleReader(System.in, System.out, new MessageRepository());
         Scanner scanner = new Scanner(System.in);
         while (true) {
             if (scanner.hasNextLine()) {

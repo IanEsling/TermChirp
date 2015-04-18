@@ -22,6 +22,15 @@ public enum Command {
         }
     };
 
+    public static Command commandFor(String command) {
+        for (Command c : Command.values()) {
+            if (c.canHandle(command)) {
+                return c;
+            }
+        }
+        throw new UnsupportedOperationException("unknown command " + command);
+    }
+
     public abstract boolean canHandle(String command);
 
     public static final String POST_INPUT = "->";
