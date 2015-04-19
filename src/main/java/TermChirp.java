@@ -3,20 +3,20 @@ import java.io.PrintStream;
 import java.util.Deque;
 import java.util.Scanner;
 
-public class ConsoleReader {
+public class TermChirp {
 
     int runs = 0;
 
-    public ConsoleReader(InputStream input,
-                         PrintStream output,
-                         MessageRepository messageRepository) {
+    public TermChirp(InputStream input,
+                     PrintStream output,
+                     MessageRepository messageRepository) {
         this(input, output, messageRepository, Double.POSITIVE_INFINITY);
     }
 
-    public ConsoleReader(InputStream input,
-                         PrintStream output,
-                         MessageRepository messageRepository,
-                         Double runTimes) {
+    public TermChirp(InputStream input,
+                     PrintStream output,
+                     MessageRepository messageRepository,
+                     Double runTimes) {
         Scanner scanner = new Scanner(input);
 
         while (runs < runTimes) {
@@ -44,5 +44,14 @@ public class ConsoleReader {
             lineScanner.close();
         }
         return command;
+    }
+
+    public static void main(String... args) {
+        LiveClock clock = new LiveClock();
+        ChirpGenerator chirpGenerator = new ChirpGenerator(clock);
+        Timelines timelines = new Timelines(chirpGenerator);
+        MessageRepository messageRepository = new MessageRepository(timelines);
+
+        new TermChirp(System.in, System.out, messageRepository);
     }
 }

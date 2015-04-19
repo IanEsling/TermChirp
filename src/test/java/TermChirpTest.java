@@ -17,7 +17,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ConsoleReaderTest {
+public class TermChirpTest {
 
     Generator<String> spacesGenerator = TermChirpRDG.spacesGenerator;
     Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
@@ -36,7 +36,7 @@ public class ConsoleReaderTest {
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
         InputStream input = getUserInputAsStream(userName, Command.POST_INPUT, message);
-        new ConsoleReader(input, output, messageRepository, 1d);
+        new TermChirp(input, output, messageRepository, 1d);
         verify(messageRepository).command(userName, Command.POST_INPUT, message);
         verify(output, never()).println(anyString());
     }
@@ -48,7 +48,7 @@ public class ConsoleReaderTest {
         String userName = userNameGenerator.next();
         String message = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, Command.FOLLOWS_INPUT, message);
-        new ConsoleReader(input, output, messageRepository, 1d);
+        new TermChirp(input, output, messageRepository, 1d);
         verify(messageRepository).command(userName, Command.FOLLOWS_INPUT, message);
         verify(output, never()).println(anyString());
     }
@@ -60,7 +60,7 @@ public class ConsoleReaderTest {
                 .willReturn(chirps);
         String userName = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, Command.WALL_INPUT, null);
-        new ConsoleReader(input, output, messageRepository, 1d);
+        new TermChirp(input, output, messageRepository, 1d);
         verify(messageRepository).command(eq(userName), eq(Command.WALL_INPUT), isNull(String.class));
         for (Chirp chirp : chirps) {
             verify(output).println(chirp.toString());
@@ -74,7 +74,7 @@ public class ConsoleReaderTest {
                 .willReturn(chirps);
         String userName = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, null, null);
-        new ConsoleReader(input, output, messageRepository, 1d);
+        new TermChirp(input, output, messageRepository, 1d);
         verify(messageRepository).command(eq(userName), isNull(String.class), isNull(String.class));
         for (Chirp chirp : chirps) {
             verify(output).println(chirp.toString());
