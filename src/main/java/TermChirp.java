@@ -1,11 +1,12 @@
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class TermChirp {
 
-    int runs = 0;
+    PresentableChirps presentableChirps = new PresentableChirps();
 
     public TermChirp(InputStream input,
                      PrintStream output,
@@ -19,15 +20,17 @@ public class TermChirp {
                      Double runTimes) {
         Scanner scanner = new Scanner(input);
 
+        int runs = 0;
         while (runs < runTimes) {
             String[] command = getInput(scanner);
             runs++;
             Deque<Chirp> chirps = messageRepository.command(command[0], command[1], command[2]);
-            for (Chirp chirp : chirps) {
-                output.println(chirp.toString());
-            }
+            Iterator<String> formattedChirps = presentableChirps.format(chirps, command[1]);
+            while (formattedChirps.hasNext())
+                output.println(formattedChirps.next());
         }
     }
+
 
     private String[] getInput(Scanner scanner) {
         String[] command = new String[3];
