@@ -28,4 +28,8 @@ public class Timelines {
             return new ArrayList<>();
         }
     }
+
+    public Collection<Chirp> getWallForUser(String userName) {
+        return null;
+    }
 }

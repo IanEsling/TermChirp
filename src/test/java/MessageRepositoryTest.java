@@ -42,6 +42,32 @@ public class MessageRepositoryTest {
     }
 
     @Test
+    public void usersCanSeeTheirWall() {
+        given(timelines.getWallForUser(anyString()))
+                .willReturn(new ArrayList<>());
+        String userName = userNameGenerator.next();
+        repo.command(userName, Command.WALL_INPUT, null);
+        verify(timelines).getWallForUser(userName);
+    }
+
+    @Test
+    public void userWallPostsAreInChronologicalOrder(){
+        Collection<Chirp> randomListOfRandomChirps = chirpListGenerator.next();
+        given(timelines.getWallForUser(anyString()))
+                .willReturn(randomListOfRandomChirps);
+        String userName = userNameGenerator.next();
+        Collection<Chirp> chirps = repo.command(userName, Command.WALL_INPUT, null);
+
+        assertThat(chirps.size()).isEqualTo(randomListOfRandomChirps.size());
+        assertThat(chirps).isNotEqualTo(randomListOfRandomChirps);
+        LocalDateTime earliest = LocalDateTime.now();
+        for (Chirp chirp : chirps) {
+            assertThat(chirp.getDateTime()).isBefore(earliest);
+            earliest = chirp.getDateTime();
+        }
+    }
+
+    @Test
     public void userCanReadOtherUsersTimeline() {
         given(timelines.getTimelineForUser(anyString()))
                 .willReturn(new ArrayList<>());
@@ -51,7 +77,7 @@ public class MessageRepositoryTest {
     }
 
     @Test
-    public void otherUserTimelinesAreInChronologicalOrder(){
+    public void otherUserTimelinesAreInChronologicalOrder() {
         Collection<Chirp> randomListOfRandomChirps = chirpListGenerator.next();
         given(timelines.getTimelineForUser(anyString()))
                 .willReturn(randomListOfRandomChirps);

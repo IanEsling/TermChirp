@@ -23,7 +23,9 @@ public class ConsoleReader {
             String[] command = getInput(scanner);
             runs++;
             Collection<Chirp> out = messageRepository.command(command[0], command[1], command[2]);
-            output.println(out);
+            for (Chirp chirp : out) {
+                output.println(chirp.toString());
+            }
         }
     }
 

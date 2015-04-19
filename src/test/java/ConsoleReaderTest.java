@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,7 +39,7 @@ public class ConsoleReaderTest {
         InputStream input = getUserInputAsStream(userName, Command.POST_INPUT, message);
         new ConsoleReader(input, output, messageRepository, 1d);
         verify(messageRepository).command(userName, Command.POST_INPUT, message);
-        verify(output).println(emptyChirps);
+        verify(output, never()).println(anyString());
     }
 
     @Test
@@ -50,18 +51,21 @@ public class ConsoleReaderTest {
         InputStream input = getUserInputAsStream(userName, Command.FOLLOWS_INPUT, message);
         new ConsoleReader(input, output, messageRepository, 1d);
         verify(messageRepository).command(userName, Command.FOLLOWS_INPUT, message);
-        verify(output).println(emptyChirps);
+        verify(output, never()).println(anyString());
     }
 
     @Test
     public void getWallCommand() {
+        Collection<Chirp> chirps = collectionOfChirps(Range.closed(10, 30));
         given(messageRepository.command(anyString(), anyString(), anyString()))
-                .willReturn(emptyChirps);
+                .willReturn(chirps);
         String userName = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, Command.WALL_INPUT, null);
         new ConsoleReader(input, output, messageRepository, 1d);
         verify(messageRepository).command(eq(userName), eq(Command.WALL_INPUT), isNull(String.class));
-        verify(output).println(emptyChirps);
+        for (Chirp chirp : chirps) {
+            verify(output).println(chirp.toString());
+        }
     }
 
     @Test
@@ -73,7 +77,9 @@ public class ConsoleReaderTest {
         InputStream input = getUserInputAsStream(userName, null, null);
         new ConsoleReader(input, output, messageRepository, 1d);
         verify(messageRepository).command(eq(userName), isNull(String.class), isNull(String.class));
-        verify(output).println(chirps);
+        for (Chirp chirp : chirps) {
+            verify(output).println(chirp.toString());
+        }
     }
 
     private Collection<Chirp> collectionOfChirps(Range<Integer> range) {
