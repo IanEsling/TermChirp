@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.TreeSet;
+import java.util.*;
 
 public class MessageRepository {
 
@@ -11,15 +9,15 @@ public class MessageRepository {
         this.timelines = timelines;
     }
 
-    public Collection<Chirp> command(String userName, String command, String message) {
+    public Deque<Chirp> command(String userName, String command, String message) {
         if (command == null) {
-            return new TreeSet<>(timelines.getTimelineForUser(userName));
+            return timelines.getTimelineForUser(userName);
         } else if (Command.POST_INPUT.equals(command)) {
             timelines.addToTimeline(userName, message);
         } else if (Command.WALL_INPUT.equals(command)) {
-            return new TreeSet<>(timelines.getWallForUser(userName));
+            return timelines.getWallForUser(userName);
         }
 
-        return new ArrayList<>();
+        return new LinkedList<>();
     }
 }

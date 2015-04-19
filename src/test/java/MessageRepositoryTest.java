@@ -6,9 +6,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.org.fyodor.generators.Generator;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -23,7 +23,7 @@ public class MessageRepositoryTest {
 
     Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
     Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
-    private Generator<List<Chirp>> chirpListGenerator = TermChirpRDG.generatorOfListOfChirps();
+    private Generator<Deque<Chirp>> chirpStackGenerator = TermChirpRDG.generatorOfStackOfChirps();
 
     MessageRepository repo;
 
@@ -36,7 +36,7 @@ public class MessageRepositoryTest {
     public void userCanPostToTimelineAndEmptySetReturned() {
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
-        Collection<Chirp> chirps = repo.command(userName, Command.POST_INPUT, message);
+        Deque<Chirp> chirps = repo.command(userName, Command.POST_INPUT, message);
         verify(timelines).addToTimeline(userName, message);
         assertThat(chirps.size()).isEqualTo(0);
     }
@@ -44,22 +44,22 @@ public class MessageRepositoryTest {
     @Test
     public void usersCanSeeTheirWall() {
         given(timelines.getWallForUser(anyString()))
-                .willReturn(new ArrayList<>());
+                .willReturn(new ArrayDeque<>());
         String userName = userNameGenerator.next();
         repo.command(userName, Command.WALL_INPUT, null);
         verify(timelines).getWallForUser(userName);
     }
 
     @Test
-    public void userWallPostsAreInChronologicalOrder(){
-        Collection<Chirp> randomListOfRandomChirps = chirpListGenerator.next();
+    public void userWallPostsAreInChronologicalOrder() {
+        Deque<Chirp> randomStackOfRandomChirps = chirpStackGenerator.next();
         given(timelines.getWallForUser(anyString()))
-                .willReturn(randomListOfRandomChirps);
+                .willReturn(randomStackOfRandomChirps);
         String userName = userNameGenerator.next();
-        Collection<Chirp> chirps = repo.command(userName, Command.WALL_INPUT, null);
+        Deque<Chirp> chirps = repo.command(userName, Command.WALL_INPUT, null);
 
-        assertThat(chirps.size()).isEqualTo(randomListOfRandomChirps.size());
-        assertThat(chirps).isNotEqualTo(randomListOfRandomChirps);
+        assertThat(chirps).isEqualTo(randomStackOfRandomChirps);
+        assertThat(chirps.size()).isEqualTo(randomStackOfRandomChirps.size());
         LocalDateTime earliest = LocalDateTime.now();
         for (Chirp chirp : chirps) {
             assertThat(chirp.getDateTime()).isBefore(earliest);
@@ -70,7 +70,7 @@ public class MessageRepositoryTest {
     @Test
     public void userCanReadOtherUsersTimeline() {
         given(timelines.getTimelineForUser(anyString()))
-                .willReturn(new ArrayList<>());
+                .willReturn(new LinkedList<>());
         String userName = userNameGenerator.next();
         repo.command(userName, null, null);
         verify(timelines).getTimelineForUser(userName);
@@ -78,14 +78,14 @@ public class MessageRepositoryTest {
 
     @Test
     public void otherUserTimelinesAreInChronologicalOrder() {
-        Collection<Chirp> randomListOfRandomChirps = chirpListGenerator.next();
+        Deque<Chirp> randomStackOfRandomChirps = chirpStackGenerator.next();
         given(timelines.getTimelineForUser(anyString()))
-                .willReturn(randomListOfRandomChirps);
+                .willReturn(randomStackOfRandomChirps);
         String userName = userNameGenerator.next();
-        Collection<Chirp> chirps = repo.command(userName, null, null);
+        Deque<Chirp> chirps = repo.command(userName, null, null);
 
-        assertThat(chirps.size()).isEqualTo(randomListOfRandomChirps.size());
-        assertThat(chirps).isNotEqualTo(randomListOfRandomChirps);
+        assertThat(chirps).containsExactlyElementsOf(randomStackOfRandomChirps);
+        assertThat(chirps.size()).isEqualTo(randomStackOfRandomChirps.size());
         LocalDateTime earliest = LocalDateTime.now();
         for (Chirp chirp : chirps) {
             assertThat(chirp.getDateTime()).isBefore(earliest);

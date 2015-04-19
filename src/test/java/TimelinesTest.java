@@ -5,8 +5,7 @@ import uk.org.fyodor.generators.RDG;
 import uk.org.fyodor.range.Range;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,6 +50,17 @@ public class TimelinesTest {
             assertThat(postedMessages).contains(chirp.getMessage());
         }
         assertThat(timelines.getTimelineForUser(userName)).hasSize(numberOfMessagesToPost);
+    }
+
+    @Test
+    public void returnWallPosts(){
+        String userName = userNameGenerator.next();
+        Deque<Chirp> chirps = TermChirpRDG.generatorOfStackOfChirps().next();
+        Map<String, Deque<Chirp>> existingChirps = new HashMap<>();
+        existingChirps.put(userName, chirps);
+        timelines = new Timelines(chirpGenerator, existingChirps);
+        Deque<Chirp> wall = timelines.getWallForUser(userName);
+        assertThat(wall).containsExactlyElementsOf(chirps);
     }
 
 }

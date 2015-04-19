@@ -8,8 +8,8 @@ import uk.org.fyodor.range.Range;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
@@ -22,8 +22,7 @@ public class ConsoleReaderTest {
     Generator<String> spacesGenerator = TermChirpRDG.spacesGenerator;
     Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
     Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
-    Generator<Chirp> chirpGenerator = TermChirpRDG.chirpGenerator();
-    Collection<Chirp> emptyChirps = new ArrayList<>();
+    Deque<Chirp> emptyChirps = new ArrayDeque<>();
 
     @Mock
     PrintStream output;
@@ -56,7 +55,7 @@ public class ConsoleReaderTest {
 
     @Test
     public void getWallCommand() {
-        Collection<Chirp> chirps = collectionOfChirps(Range.closed(10, 30));
+        Deque<Chirp> chirps = collectionOfChirps(Range.closed(10, 30));
         given(messageRepository.command(anyString(), anyString(), anyString()))
                 .willReturn(chirps);
         String userName = userNameGenerator.next();
@@ -70,7 +69,7 @@ public class ConsoleReaderTest {
 
     @Test
     public void getReadingCommand() {
-        Collection<Chirp> chirps = collectionOfChirps(Range.closed(10, 30));
+        Deque<Chirp> chirps = collectionOfChirps(Range.closed(10, 30));
         given(messageRepository.command(anyString(), anyString(), anyString()))
                 .willReturn(chirps);
         String userName = userNameGenerator.next();
@@ -82,8 +81,8 @@ public class ConsoleReaderTest {
         }
     }
 
-    private Collection<Chirp> collectionOfChirps(Range<Integer> range) {
-        return TermChirpRDG.list(chirpGenerator, range).next();
+    private Deque<Chirp> collectionOfChirps(Range<Integer> range) {
+        return TermChirpRDG.generatorOfStackOfChirps(range).next();
     }
 
     private InputStream getUserInputAsStream(String userName, String command, String message) {

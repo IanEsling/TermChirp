@@ -3,7 +3,7 @@ import uk.org.fyodor.generators.RDG;
 import uk.org.fyodor.range.Range;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 public class TermChirpRDG extends RDG {
 
@@ -11,12 +11,34 @@ public class TermChirpRDG extends RDG {
     public static Generator<String> messageGenerator = RDG.string(Range.closed(25, 150), Range.closed(32, 126));
     public static Generator<String> spacesGenerator = RDG.string(Range.closed(1, 10), " ");
 
-    public static Generator<List<Chirp>> generatorOfListOfChirps(){
-        return generatorOfListOfChirps(Range.closed(10, 30));
+    public static class DequeGenerator<T extends Comparable<T>> implements Generator<Deque<T>> {
+
+        private final Generator<List<T>> listGeneratorOfT;
+
+        public DequeGenerator(final Generator<List<T>> listGeneratorOfT) {
+            this.listGeneratorOfT = listGeneratorOfT;
+        }
+
+        @Override
+        public Deque<T> next() {
+            List<T> list = listGeneratorOfT.next();
+            Collections.sort(list);
+            Collections.reverse(list);
+            Deque<T> stack = new LinkedList<>();
+            for (T t : list) {
+                stack.push(t);
+            }
+
+            return stack;
+        }
     }
 
-    public static Generator<List<Chirp>> generatorOfListOfChirps(Range<Integer> range) {
-        return RDG.list(chirpGenerator(), range);
+    public static Generator<Deque<Chirp>> generatorOfStackOfChirps() {
+        return generatorOfStackOfChirps(Range.closed(10, 30));
+    }
+
+    public static Generator<Deque<Chirp>> generatorOfStackOfChirps(Range<Integer> range) {
+        return new DequeGenerator<>(RDG.list(chirpGenerator(), range));
     }
 
     public static Generator<Chirp> chirpGenerator() {
