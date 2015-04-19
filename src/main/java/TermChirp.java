@@ -6,17 +6,17 @@ import java.util.Scanner;
 
 public class TermChirp {
 
-    PresentableChirps presentableChirps = new PresentableChirps();
-
     public TermChirp(InputStream input,
                      PrintStream output,
-                     MessageRepository messageRepository) {
-        this(input, output, messageRepository, Double.POSITIVE_INFINITY);
+                     MessageRepository messageRepository,
+                     PresentableChirps presentableChirps) {
+        this(input, output, messageRepository, presentableChirps, Double.POSITIVE_INFINITY);
     }
 
     public TermChirp(InputStream input,
                      PrintStream output,
                      MessageRepository messageRepository,
+                     PresentableChirps presentableChirps,
                      Double runTimes) {
         Scanner scanner = new Scanner(input);
 
@@ -30,7 +30,6 @@ public class TermChirp {
                 output.println(formattedChirps.next());
         }
     }
-
 
     private String[] getInput(Scanner scanner) {
         String[] command = new String[3];
@@ -54,7 +53,8 @@ public class TermChirp {
         ChirpGenerator chirpGenerator = new ChirpGenerator(clock);
         Timelines timelines = new Timelines(chirpGenerator);
         MessageRepository messageRepository = new MessageRepository(timelines);
+        PresentableChirps presentableChirps = new PresentableChirps(new LiveClock());
 
-        new TermChirp(System.in, System.out, messageRepository);
+        new TermChirp(System.in, System.out, messageRepository, presentableChirps);
     }
 }

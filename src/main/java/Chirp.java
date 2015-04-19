@@ -1,8 +1,6 @@
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 public class Chirp implements Comparable<Chirp> {
     private final String message;
@@ -27,23 +25,23 @@ public class Chirp implements Comparable<Chirp> {
     public String getMessage() {
         return message;
     }
-
-    @Override
-    public String toString() {
-        return message +
-                " (" +
-                prettyTime.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())) +
-                ")";
-    }
-
-    public String toStringWithUser() {
-        return  userName +
-                " - " +
-                message +
-                " (" +
-                prettyTime.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())) +
-                ")";
-    }
+//
+//    @Override
+//    public String toString() {
+//        return message +
+//                " (" +
+//                prettyTime.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())) +
+//                ")";
+//    }
+//
+//    public String toStringWithUser() {
+//        return  userName +
+//                " - " +
+//                message +
+//                " (" +
+//                prettyTime.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())) +
+//                ")";
+//    }
 
     @Override
     public boolean equals(Object o) {
