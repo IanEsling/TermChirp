@@ -5,13 +5,19 @@ import java.time.ZoneId;
 import java.util.Date;
 
 public class Chirp implements Comparable<Chirp> {
-    private String message;
-    private LocalDateTime dateTime;
-    private PrettyTime prettyTime = new PrettyTime();
+    private final String message;
+    private final String userName;
+    private final LocalDateTime dateTime;
+    private final PrettyTime prettyTime = new PrettyTime();
 
-    public Chirp(String message, LocalDateTime dateTime) {
+    public Chirp(String userName, String message, LocalDateTime dateTime) {
+        this.userName = userName;
         this.dateTime = dateTime;
         this.message = message;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     public LocalDateTime getDateTime() {
@@ -25,6 +31,15 @@ public class Chirp implements Comparable<Chirp> {
     @Override
     public String toString() {
         return message +
+                " (" +
+                prettyTime.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())) +
+                ")";
+    }
+
+    public String toStringWithUser() {
+        return  userName +
+                " - " +
+                message +
                 " (" +
                 prettyTime.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())) +
                 ")";

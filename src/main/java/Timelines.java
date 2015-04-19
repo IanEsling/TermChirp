@@ -15,7 +15,7 @@ public class Timelines {
     }
 
     public void addToTimeline(String userName, String message) {
-        Chirp chirp = chirpGenerator.generateChirp(message);
+        Chirp chirp = chirpGenerator.generateChirp(userName, message);
         if (timelines.containsKey(userName)) {
             timelines.get(userName).push(chirp);
         } else {

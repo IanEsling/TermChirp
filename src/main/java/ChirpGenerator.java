@@ -5,7 +5,7 @@ public class ChirpGenerator {
         this.clock = clock;
     }
 
-    public Chirp generateChirp(String message) {
-        return new Chirp(message, clock.now());
+    public Chirp generateChirp(String userName, String message) {
+        return new Chirp(userName, message, clock.now());
     }
 }

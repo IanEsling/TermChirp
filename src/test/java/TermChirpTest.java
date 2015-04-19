@@ -63,7 +63,7 @@ public class TermChirpTest {
         new TermChirp(input, output, messageRepository, 1d);
         verify(messageRepository).command(eq(userName), eq(Command.WALL_INPUT), isNull(String.class));
         for (Chirp chirp : chirps) {
-            verify(output).println(chirp.toString());
+            verify(output).println(chirp.toStringWithUser());
         }
     }
 
