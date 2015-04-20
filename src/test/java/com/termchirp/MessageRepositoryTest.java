@@ -94,4 +94,14 @@ public class MessageRepositoryTest {
             earliest = chirp.getDateTime();
         }
     }
+
+    @Test
+    public void usersCanFollowOtherUsers(){
+        String followingUser = userNameGenerator.next();
+        String followedUser = userNameGenerator.next();
+        given(timelines.follow(anyString(), anyString()))
+                .willReturn(new LinkedList<>());
+        repo.command(followingUser, TermChirp.FOLLOWS_INPUT, followedUser);
+        verify(timelines).follow(followingUser, followedUser);
+    }
 }

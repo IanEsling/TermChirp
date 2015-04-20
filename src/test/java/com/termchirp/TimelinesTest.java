@@ -66,4 +66,19 @@ public class TimelinesTest {
         assertThat(wall).containsExactlyElementsOf(chirps);
     }
 
+    @Test
+    public void followingUserShowsTheirChirpsOnWall() {
+        String followingUser = userNameGenerator.next();
+        String followedUser = userNameGenerator.next();
+        Deque<Chirp> followingUserChirps = TermChirpRDG.generatorOfStackOfChirps().next();
+        Deque<Chirp> followedUserChirps = TermChirpRDG.generatorOfStackOfChirps().next();
+        Map<String, Deque<Chirp>> existingChirps = new HashMap<>();
+        existingChirps.put(followingUser, followingUserChirps);
+        existingChirps.put(followedUser, followedUserChirps);
+        timelines = new Timelines(chirpGenerator, existingChirps);
+        timelines.follow(followingUser, followedUser);
+        Deque<Chirp> allChirps = timelines.getWallForUser(followingUser);
+        allChirps.addAll(timelines.getWallForUser(followedUser));
+        assertThat(allChirps).containsExactlyElementsOf(allChirps);
+    }
 }

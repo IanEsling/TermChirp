@@ -18,6 +18,8 @@ public class MessageRepository {
             timelines.addToTimeline(userName, message);
         } else if (TermChirp.WALL_INPUT.equals(command)) {
             return timelines.getWallForUser(userName);
+        } else if (TermChirp.FOLLOWS_INPUT.equals(command)) {
+            return timelines.follow(userName, message);
         }
 
         return new LinkedList<>();
