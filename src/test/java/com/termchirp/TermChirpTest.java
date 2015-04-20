@@ -1,9 +1,11 @@
+package com.termchirp;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.org.fyodor.generators.Generator;
 import uk.org.fyodor.range.Range;
 
 import java.io.ByteArrayInputStream;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+import static com.termchirp.TermChirpRDG.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
@@ -23,9 +26,6 @@ import static org.mockito.Mockito.verify;
 public class TermChirpTest {
 
     public static final String PRESENTABLE_OUTPUT = "Quack";
-    Generator<String> spacesGenerator = TermChirpRDG.spacesGenerator;
-    Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
-    Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
     Deque<Chirp> emptyChirps = new ArrayDeque<>();
     List<String> presentableOutput;
 
@@ -37,7 +37,7 @@ public class TermChirpTest {
     PresentableChirps presentableChirps;
 
     @Before
-    public void presentableOutput(){
+    public void presentableOutput() {
         presentableOutput = new ArrayList<>();
         presentableOutput.add(PRESENTABLE_OUTPUT);
         given(presentableChirps.format(any(), anyString()))
@@ -53,9 +53,9 @@ public class TermChirpTest {
                 .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
-        InputStream input = getUserInputAsStream(userName, Command.POST_INPUT, message);
+        InputStream input = getUserInputAsStream(userName, TermChirp.POST_INPUT, message);
         new TermChirp(input, output, messageRepository, presentableChirps, 1d);
-        verify(messageRepository).command(userName, Command.POST_INPUT, message);
+        verify(messageRepository).command(userName, TermChirp.POST_INPUT, message);
         verify(output, never()).println(anyString());
     }
 
@@ -67,9 +67,9 @@ public class TermChirpTest {
                 .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         String message = userNameGenerator.next();
-        InputStream input = getUserInputAsStream(userName, Command.FOLLOWS_INPUT, message);
+        InputStream input = getUserInputAsStream(userName, TermChirp.FOLLOWS_INPUT, message);
         new TermChirp(input, output, messageRepository, presentableChirps, 1d);
-        verify(messageRepository).command(userName, Command.FOLLOWS_INPUT, message);
+        verify(messageRepository).command(userName, TermChirp.FOLLOWS_INPUT, message);
         verify(output, never()).println(anyString());
     }
 
@@ -79,9 +79,9 @@ public class TermChirpTest {
         given(messageRepository.command(anyString(), anyString(), anyString()))
                 .willReturn(chirps);
         String userName = userNameGenerator.next();
-        InputStream input = getUserInputAsStream(userName, Command.WALL_INPUT, null);
+        InputStream input = getUserInputAsStream(userName, TermChirp.WALL_INPUT, null);
         new TermChirp(input, output, messageRepository, presentableChirps, 1d);
-        verify(messageRepository).command(eq(userName), eq(Command.WALL_INPUT), isNull(String.class));
+        verify(messageRepository).command(eq(userName), Matchers.eq(TermChirp.WALL_INPUT), isNull(String.class));
         verify(output).println("Quack");
     }
 

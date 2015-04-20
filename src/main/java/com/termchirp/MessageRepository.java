@@ -1,3 +1,5 @@
+package com.termchirp;
+
 import java.util.*;
 
 public class MessageRepository {
@@ -12,9 +14,9 @@ public class MessageRepository {
     public Deque<Chirp> command(String userName, String command, String message) {
         if (command == null) {
             return timelines.getTimelineForUser(userName);
-        } else if (Command.POST_INPUT.equals(command)) {
+        } else if (TermChirp.POST_INPUT.equals(command)) {
             timelines.addToTimeline(userName, message);
-        } else if (Command.WALL_INPUT.equals(command)) {
+        } else if (TermChirp.WALL_INPUT.equals(command)) {
             return timelines.getWallForUser(userName);
         }
 

@@ -1,3 +1,5 @@
+package com.termchirp;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +12,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 
+import static com.termchirp.TermChirpRDG.messageGenerator;
+import static com.termchirp.TermChirpRDG.userNameGenerator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
@@ -21,8 +25,6 @@ public class MessageRepositoryTest {
     @Mock
     Timelines timelines;
 
-    Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
-    Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
     private Generator<Deque<Chirp>> chirpStackGenerator = TermChirpRDG.generatorOfStackOfChirps();
 
     MessageRepository repo;
@@ -36,7 +38,7 @@ public class MessageRepositoryTest {
     public void userCanPostToTimelineAndEmptySetReturned() {
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
-        Deque<Chirp> chirps = repo.command(userName, Command.POST_INPUT, message);
+        Deque<Chirp> chirps = repo.command(userName, TermChirp.POST_INPUT, message);
         verify(timelines).addToTimeline(userName, message);
         assertThat(chirps.size()).isEqualTo(0);
     }
@@ -46,7 +48,7 @@ public class MessageRepositoryTest {
         given(timelines.getWallForUser(anyString()))
                 .willReturn(new ArrayDeque<>());
         String userName = userNameGenerator.next();
-        repo.command(userName, Command.WALL_INPUT, null);
+        repo.command(userName, TermChirp.WALL_INPUT, null);
         verify(timelines).getWallForUser(userName);
     }
 
@@ -56,7 +58,7 @@ public class MessageRepositoryTest {
         given(timelines.getWallForUser(anyString()))
                 .willReturn(randomStackOfRandomChirps);
         String userName = userNameGenerator.next();
-        Deque<Chirp> chirps = repo.command(userName, Command.WALL_INPUT, null);
+        Deque<Chirp> chirps = repo.command(userName, TermChirp.WALL_INPUT, null);
 
         assertThat(chirps).isEqualTo(randomStackOfRandomChirps);
         assertThat(chirps.size()).isEqualTo(randomStackOfRandomChirps.size());

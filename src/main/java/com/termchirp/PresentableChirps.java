@@ -1,3 +1,6 @@
+package com.termchirp;
+
+import com.termchirp.clock.Clock;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.time.LocalDateTime;
@@ -22,7 +25,7 @@ public class PresentableChirps {
         Deque<String> presentable = new ArrayDeque<>(chirps.size());
         Iterator<Chirp> iter = chirps.iterator();
         while (iter.hasNext()) {
-            if (Command.WALL_INPUT.equals(command)) {
+            if (TermChirp.WALL_INPUT.equals(command)) {
                 presentable.push(formatForWall(iter.next()));
             } else {
                 presentable.push(formatForReading(iter.next()));

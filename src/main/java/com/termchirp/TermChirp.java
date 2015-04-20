@@ -1,3 +1,7 @@
+package com.termchirp;
+
+import com.termchirp.clock.LiveClock;
+
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Deque;
@@ -5,6 +9,10 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 public class TermChirp {
+
+    public static final String POST_INPUT = "->";
+    public static final String WALL_INPUT = "wall";
+    public static final String FOLLOWS_INPUT = "follows";
 
     public TermChirp(InputStream input,
                      PrintStream output,

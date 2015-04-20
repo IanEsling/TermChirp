@@ -1,33 +1,36 @@
+package com.termchirp;
+
+import com.termchirp.clock.Clock;
+import com.termchirp.clock.TestClock;
 import org.junit.Before;
 import org.junit.Test;
-import uk.org.fyodor.generators.Generator;
 import uk.org.fyodor.generators.RDG;
 import uk.org.fyodor.range.Range;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.termchirp.TermChirpRDG.messageGenerator;
+import static com.termchirp.TermChirpRDG.userNameGenerator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TimelinesTest {
 
     LocalDateTime now = LocalDateTime.now();
-    Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
-    Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
 
     Clock clock;
     ChirpGenerator chirpGenerator;
     Timelines timelines;
 
     @Before
-    public void setupTimelines(){
+    public void setupTimelines() {
         clock = new TestClock(now);
         chirpGenerator = new ChirpGenerator(clock);
         timelines = new Timelines(chirpGenerator);
     }
 
     @Test
-    public void createTimelineForFirstPost(){
+    public void createTimelineForFirstPost() {
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
         assertThat(timelines.getTimelineForUser(userName)).hasSize(0);
@@ -37,7 +40,7 @@ public class TimelinesTest {
     }
 
     @Test
-    public void addThenReadPosts(){
+    public void addThenReadPosts() {
         String userName = userNameGenerator.next();
         Integer numberOfMessagesToPost = RDG.integer(Range.closed(5, 50)).next();
         Collection<String> postedMessages = new ArrayList<>(numberOfMessagesToPost);
@@ -53,7 +56,7 @@ public class TimelinesTest {
     }
 
     @Test
-    public void returnWallPosts(){
+    public void returnWallPosts() {
         String userName = userNameGenerator.next();
         Deque<Chirp> chirps = TermChirpRDG.generatorOfStackOfChirps().next();
         Map<String, Deque<Chirp>> existingChirps = new HashMap<>();

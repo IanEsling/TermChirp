@@ -1,3 +1,5 @@
+package com.termchirp;
+
 import uk.org.fyodor.generators.Generator;
 import uk.org.fyodor.generators.RDG;
 import uk.org.fyodor.range.Range;

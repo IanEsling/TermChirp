@@ -1,3 +1,7 @@
+package com.termchirp;
+
+import com.termchirp.clock.Clock;
+
 public class ChirpGenerator {
     private Clock clock;
 

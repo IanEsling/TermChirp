@@ -1,21 +1,23 @@
+package com.termchirp;
+
+import com.termchirp.clock.TestClock;
 import org.junit.Before;
 import org.junit.Test;
-import uk.org.fyodor.generators.Generator;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.termchirp.TermChirpRDG.userNameGenerator;
+import static com.termchirp.TermChirpRDG.messageGenerator;
 
 public class ChirpTest {
 
-    Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
-    Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
     LocalDateTime now = LocalDateTime.now();
     TestClock clock;
     ChirpGenerator chirpGenerator;
 
     @Before
-    public void setupChirpGenerator(){
+    public void setupChirpGenerator() {
         clock = new TestClock(now);
         chirpGenerator = new ChirpGenerator(clock);
     }

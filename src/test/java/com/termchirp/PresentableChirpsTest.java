@@ -1,12 +1,16 @@
+package com.termchirp;
+
+import com.termchirp.clock.TestClock;
 import org.junit.Before;
 import org.junit.Test;
-import uk.org.fyodor.generators.Generator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
+import static com.termchirp.TermChirpRDG.messageGenerator;
+import static com.termchirp.TermChirpRDG.userNameGenerator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PresentableChirpsTest {
@@ -28,8 +32,6 @@ public class PresentableChirpsTest {
     TestClock clock;
     ChirpGenerator chirpGenerator;
     PresentableChirps presentableChirps;
-    Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
-    Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
 
     @Before
     public void setupChirpGenerator() {
@@ -44,7 +46,7 @@ public class PresentableChirpsTest {
         String message = messageGenerator.next();
         Deque<Chirp> chirps = new ArrayDeque<>();
         chirps.push(chirpGenerator.generateChirp(userName, message));
-        Iterator<String> formatted = presentableChirps.format(chirps, Command.WALL_INPUT);
+        Iterator<String> formatted = presentableChirps.format(chirps, TermChirp.WALL_INPUT);
         assertThat(formatted.next()).isEqualTo(String.format("%s - %s %s", userName, message, MOMENTS_AGO));
     }
 
@@ -59,12 +61,12 @@ public class PresentableChirpsTest {
     }
 
     @Test
-    public void orderIsPreservedForWall(){
-        checkOrderForCommand(userNameGenerator.next(), Command.WALL_INPUT);
+    public void orderIsPreservedForWall() {
+        checkOrderForCommand(userNameGenerator.next(), TermChirp.WALL_INPUT);
     }
 
     @Test
-    public void orderIsPreservedForReading(){
+    public void orderIsPreservedForReading() {
         checkOrderForCommand(userNameGenerator.next(), null);
     }
 
@@ -123,7 +125,7 @@ public class PresentableChirpsTest {
             assertThat(formatted.next()).isEqualTo(String.format("%s %s", message5HoursAgo, FIVE_HOURS_AGO));
             assertThat(formatted.next()).isEqualTo(String.format("%s %s", message1DayAgo, A_DAY_AGO));
             assertThat(formatted.next()).isEqualTo(String.format("%s %s", message5DaysAgo, FIVE_DAYS_AGO));
-        } else if (Command.WALL_INPUT.equals(command)) {
+        } else if (TermChirp.WALL_INPUT.equals(command)) {
             assertThat(formatted.next()).isEqualTo(String.format("%s - %s %s", userName, messageMomentsAgo, MOMENTS_AGO));
             assertThat(formatted.next()).isEqualTo(String.format("%s - %s %s", userName, message10SecondsAgo, TEN_SECONDS_AGO));
             assertThat(formatted.next()).isEqualTo(String.format("%s - %s %s", userName, message59SecondsAgo, FIFTY_NINE_SECONDS_AGO));
