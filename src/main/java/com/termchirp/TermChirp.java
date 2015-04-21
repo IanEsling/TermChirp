@@ -1,10 +1,8 @@
 package com.termchirp;
 
-import com.termchirp.clock.LiveClock;
-
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Deque;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -14,28 +12,27 @@ public class TermChirp {
     public static final String WALL_INPUT = "wall";
     public static final String FOLLOWS_INPUT = "follows";
 
-    public TermChirp(InputStream input,
-                     PrintStream output,
-                     MessageRepository messageRepository,
-                     PresentableChirps presentableChirps) {
-        this(input, output, messageRepository, presentableChirps, Double.POSITIVE_INFINITY);
+    public TermChirp(InputStream input, PrintStream output) {
+        this(input, output, new CommandInterpreter(), new PresentableChirps(), Double.POSITIVE_INFINITY);
     }
 
     public TermChirp(InputStream input,
                      PrintStream output,
-                     MessageRepository messageRepository,
+                     CommandInterpreter commandInterpreter,
                      PresentableChirps presentableChirps,
                      Double runTimes) {
         Scanner scanner = new Scanner(input);
 
         int runs = 0;
-        while (runs < runTimes) {
+        while (runTimes == Double.POSITIVE_INFINITY || runs < runTimes) {
             String[] command = getInput(scanner);
             runs++;
-            Deque<Chirp> chirps = messageRepository.command(command[0], command[1], command[2]);
-            Iterator<String> formattedChirps = presentableChirps.format(chirps, command[1]);
-            while (formattedChirps.hasNext())
-                output.println(formattedChirps.next());
+            if (command[0] != null) {
+                Collection<Chirp> chirps = commandInterpreter.command(command[0], command[1], command[2]);
+                Iterator<String> formattedChirps = presentableChirps.format(chirps, command[1]);
+                while (formattedChirps.hasNext())
+                    output.println(formattedChirps.next());
+            }
         }
     }
 
@@ -43,26 +40,22 @@ public class TermChirp {
         String[] command = new String[3];
         if (scanner.hasNextLine()) {
             Scanner lineScanner = new Scanner(scanner.nextLine());
-            command[0] = lineScanner.next();
             if (lineScanner.hasNext()) {
-                command[1] = lineScanner.next();
+                command[0] = lineScanner.next();
                 if (lineScanner.hasNext()) {
-                    lineScanner.useDelimiter("\\z");
-                    command[2] = lineScanner.next().trim();
+                    command[1] = lineScanner.next();
+                    if (lineScanner.hasNext()) {
+                        lineScanner.useDelimiter("\\z");
+                        command[2] = lineScanner.next().trim();
+                    }
                 }
+                lineScanner.close();
             }
-            lineScanner.close();
         }
         return command;
     }
 
     public static void main(String... args) {
-        LiveClock clock = new LiveClock();
-        ChirpGenerator chirpGenerator = new ChirpGenerator(clock);
-        Timelines timelines = new Timelines(chirpGenerator);
-        MessageRepository messageRepository = new MessageRepository(timelines);
-        PresentableChirps presentableChirps = new PresentableChirps(new LiveClock());
-
-        new TermChirp(System.in, System.out, messageRepository, presentableChirps);
+        new TermChirp(System.in, System.out);
     }
 }

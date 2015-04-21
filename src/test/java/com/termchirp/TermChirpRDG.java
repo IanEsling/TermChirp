@@ -38,21 +38,20 @@ public class TermChirpRDG extends RDG {
         }
     }
 
-    public static Generator<Deque<Chirp>> generatorOfStackOfChirps() {
-        return generatorOfStackOfChirps(Range.closed(10, 30));
+    public static Generator<Deque<Chirp>> generatorOfChronologicallyOrderedStackOfChirps(String userName) {
+        return generatorOfChronologicallyOrderedStackOfChirps(userName, Range.closed(10, 30));
     }
 
-    public static Generator<Deque<Chirp>> generatorOfStackOfChirps(Range<Integer> range) {
-        return new DequeGenerator<>(RDG.list(chirpGenerator(), range));
+    public static Generator<Deque<Chirp>> generatorOfChronologicallyOrderedStackOfChirps(String userName, Range<Integer> range) {
+        return new DequeGenerator<>(RDG.list(chirpGenerator(userName), range));
     }
 
-    public static Generator<Chirp> chirpGenerator() {
+    public static Generator<Chirp> chirpGenerator(String userName) {
         return new Generator<Chirp>() {
-            Generator<String> userNameGenerator = TermChirpRDG.userNameGenerator;
             Generator<String> messageGenerator = TermChirpRDG.messageGenerator;
 
             public Chirp next() {
-                return new Chirp(userNameGenerator.next(),
+                return new Chirp(userName,
                         messageGenerator.next(),
                         LocalDateTime.now().minusMinutes(RDG.longVal(Range.closed(0l, 7200l)).next()));
             }

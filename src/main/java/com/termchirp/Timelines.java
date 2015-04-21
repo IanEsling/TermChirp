@@ -1,25 +1,32 @@
 package com.termchirp;
 
+import com.termchirp.clock.Clock;
+import com.termchirp.clock.LiveClock;
+
 import java.util.*;
 
 public class Timelines {
 
     private final Map<String, Collection<String>> follows;
     private final Map<String, Deque<Chirp>> timelines;
-    private final ChirpGenerator chirpGenerator;
+    private final Clock clock;
 
-    public Timelines(ChirpGenerator chirpGenerator) {
-        this(chirpGenerator, new HashMap<>());
+    public Timelines() {
+        this(new LiveClock());
     }
 
-    public Timelines(ChirpGenerator chirpGenerator, Map<String, Deque<Chirp>> timelines) {
-        this.chirpGenerator = chirpGenerator;
+    public Timelines(Clock clock) {
+        this(clock, new HashMap<>());
+    }
+
+    public Timelines(Clock clock, Map<String, Deque<Chirp>> timelines) {
+        this.clock = clock;
         this.timelines = timelines;
         this.follows = new HashMap<>();
     }
 
-    public void addToTimeline(String userName, String message) {
-        Chirp chirp = chirpGenerator.generateChirp(userName, message);
+    public Collection<Chirp> addToTimeline(String userName, String message) {
+        Chirp chirp = new Chirp(userName, message, clock.now());
         if (timelines.containsKey(userName)) {
             timelines.get(userName).push(chirp);
         } else {
@@ -27,10 +34,10 @@ public class Timelines {
             messages.add(chirp);
             timelines.put(userName, messages);
         }
+        return new ArrayDeque<>();
     }
 
-    public Deque<Chirp> getTimelineForUser(String userName) {
-
+    public Collection<Chirp> getTimelineForUser(String userName) {
         if (timelines.containsKey(userName)) {
             return timelines.get(userName);
         } else {
@@ -38,17 +45,19 @@ public class Timelines {
         }
     }
 
-    public Deque<Chirp> getWallForUser(String userName) {
-        Deque<Chirp> wall = getTimelineForUser(userName);
+    public Collection<Chirp> getWallForUser(String userName) {
         if (follows.containsKey(userName)) {
+            TreeSet<Chirp> wall = new TreeSet<>(getTimelineForUser(userName));
             for (String followedUser : follows.get(userName)) {
                 wall.addAll(getTimelineForUser(followedUser));
             }
+            return wall;
+        } else {
+            return getTimelineForUser(userName);
         }
-        return wall;
     }
 
-    public Deque<Chirp> follow(String followingUser, String followedUser) {
+    public Collection<Chirp> follow(String followingUser, String followedUser) {
         if (follows.containsKey(followingUser)) {
             follows.get(followingUser).add(followedUser);
         } else {

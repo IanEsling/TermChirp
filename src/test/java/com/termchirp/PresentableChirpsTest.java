@@ -30,14 +30,12 @@ public class PresentableChirpsTest {
 
     LocalDateTime now = LocalDateTime.now();
     TestClock clock;
-    ChirpGenerator chirpGenerator;
     PresentableChirps presentableChirps;
 
     @Before
     public void setupChirpGenerator() {
         clock = new TestClock(now);
         presentableChirps = new PresentableChirps(clock);
-        chirpGenerator = new ChirpGenerator(clock);
     }
 
     @Test
@@ -45,7 +43,7 @@ public class PresentableChirpsTest {
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
         Deque<Chirp> chirps = new ArrayDeque<>();
-        chirps.push(chirpGenerator.generateChirp(userName, message));
+        chirps.push(new Chirp(userName, message, clock.now()));
         Iterator<String> formatted = presentableChirps.format(chirps, TermChirp.WALL_INPUT);
         assertThat(formatted.next()).isEqualTo(String.format("%s - %s %s", userName, message, MOMENTS_AGO));
     }
@@ -55,7 +53,7 @@ public class PresentableChirpsTest {
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
         Deque<Chirp> chirps = new ArrayDeque<>();
-        chirps.push(chirpGenerator.generateChirp(userName, message));
+        chirps.push(new Chirp(userName, message, clock.now()));
         Iterator<String> formatted = presentableChirps.format(chirps, null);
         assertThat(formatted.next()).isEqualTo(String.format("%s %s", message, MOMENTS_AGO));
     }
@@ -86,29 +84,29 @@ public class PresentableChirpsTest {
         String messageMomentsAgo = messageGenerator.next();
 
         clock.setNow(now.minusDays(5));
-        chirps.push(chirpGenerator.generateChirp(userName, message5DaysAgo));
+        chirps.push(newChirp(userName, message5DaysAgo));
         clock.setNow(now.minusDays(1));
-        chirps.push(chirpGenerator.generateChirp(userName, message1DayAgo));
+        chirps.push(newChirp(userName, message1DayAgo));
         clock.setNow(now.minusHours(5));
-        chirps.push(chirpGenerator.generateChirp(userName, message5HoursAgo));
+        chirps.push(newChirp(userName, message5HoursAgo));
         clock.setNow(now.minusHours(1));
-        chirps.push(chirpGenerator.generateChirp(userName, message1HourAgo));
+        chirps.push(newChirp(userName, message1HourAgo));
         clock.setNow(now.minusMinutes(5));
-        chirps.push(chirpGenerator.generateChirp(userName, message5MinutesAgo));
+        chirps.push(newChirp(userName, message5MinutesAgo));
         clock.setNow(now.minusMinutes(4));
-        chirps.push(chirpGenerator.generateChirp(userName, message4MinutesAgo));
+        chirps.push(newChirp(userName, message4MinutesAgo));
         clock.setNow(now.minusMinutes(3));
-        chirps.push(chirpGenerator.generateChirp(userName, message3MinutesAgo));
+        chirps.push(newChirp(userName, message3MinutesAgo));
         clock.setNow(now.minusMinutes(2));
-        chirps.push(chirpGenerator.generateChirp(userName, message2MinutesAgo));
+        chirps.push(newChirp(userName, message2MinutesAgo));
         clock.setNow(now.minusMinutes(1));
-        chirps.push(chirpGenerator.generateChirp(userName, message1MinuteAgo));
+        chirps.push(newChirp(userName, message1MinuteAgo));
         clock.setNow(now.minusSeconds(59));
-        chirps.push(chirpGenerator.generateChirp(userName, message59SecondsAgo));
+        chirps.push(newChirp(userName, message59SecondsAgo));
         clock.setNow(now.minusSeconds(10));
-        chirps.push(chirpGenerator.generateChirp(userName, message10SecondsAgo));
+        chirps.push(newChirp(userName, message10SecondsAgo));
         clock.setNow(now.minusSeconds(5));
-        chirps.push(chirpGenerator.generateChirp(userName, messageMomentsAgo));
+        chirps.push(newChirp(userName, messageMomentsAgo));
         clock.setNow(now);
         Iterator<String> formatted = presentableChirps.format(chirps, command);
 
@@ -140,5 +138,9 @@ public class PresentableChirpsTest {
             assertThat(formatted.next()).isEqualTo(String.format("%s - %s %s", userName, message5DaysAgo, FIVE_DAYS_AGO));
         }
         assertThat(formatted.hasNext()).isFalse();
+    }
+
+    private Chirp newChirp(String userName, String message) {
+        return new Chirp(userName, message, clock.now());
     }
 }

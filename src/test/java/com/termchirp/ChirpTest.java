@@ -14,19 +14,17 @@ public class ChirpTest {
 
     LocalDateTime now = LocalDateTime.now();
     TestClock clock;
-    ChirpGenerator chirpGenerator;
 
     @Before
     public void setupChirpGenerator() {
         clock = new TestClock(now);
-        chirpGenerator = new ChirpGenerator(clock);
     }
 
     @Test
     public void messageStoredWithDateTime() {
         String message = messageGenerator.next();
         String userName = userNameGenerator.next();
-        Chirp chirp = chirpGenerator.generateChirp(userName, message);
+        Chirp chirp = new Chirp(userName, message, clock.now());
         assertThat(chirp.getDateTime()).isEqualTo(now);
     }
 }

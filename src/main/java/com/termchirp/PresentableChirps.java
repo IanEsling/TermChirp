@@ -1,38 +1,38 @@
 package com.termchirp;
 
 import com.termchirp.clock.Clock;
+import com.termchirp.clock.LiveClock;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayDeque;
-import java.util.Date;
-import java.util.Deque;
-import java.util.Iterator;
+import java.util.*;
 
 public class PresentableChirps {
 
     private Clock clock;
     private final PrettyTime prettyTime = new PrettyTime();
 
+    public PresentableChirps() {
+        this(new LiveClock());
+    }
+
     public PresentableChirps(Clock clock) {
         this.clock = clock;
     }
 
-    public Iterator<String> format(Deque<Chirp> chirps, String command) {
-
-        Deque<String> presentable = new ArrayDeque<>(chirps.size());
+    public Iterator<String> format(Collection<Chirp> chirps, String command) {
+        List<String> presentable = new ArrayList<>(chirps.size());
         Iterator<Chirp> iter = chirps.iterator();
         while (iter.hasNext()) {
             if (TermChirp.WALL_INPUT.equals(command)) {
-                presentable.push(formatForWall(iter.next()));
+                presentable.add(formatForWall(iter.next()));
             } else {
-                presentable.push(formatForReading(iter.next()));
+                presentable.add(formatForReading(iter.next()));
             }
         }
-        return presentable.descendingIterator();
-
+        return presentable.iterator();
     }
 
     private String formatForReading(Chirp chirp) {
@@ -61,7 +61,7 @@ public class PresentableChirps {
         } else if (diff >= 1000 * 60) {
             return "1 minute ago";
         } else if (diff >= 1000 * 10) {
-            return String.format("%d seconds ago", diff/1000);
+            return String.format("%d seconds ago", diff / 1000);
         } else {
             return "moments ago";
         }

@@ -9,6 +9,7 @@ import uk.org.fyodor.generators.Generator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -20,25 +21,23 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MessageRepositoryTest {
+public class CommandInterpreterTest {
 
     @Mock
     Timelines timelines;
 
-    private Generator<Deque<Chirp>> chirpStackGenerator = TermChirpRDG.generatorOfStackOfChirps();
-
-    MessageRepository repo;
+    CommandInterpreter repo;
 
     @Before
     public void createRepo() {
-        repo = new MessageRepository(timelines);
+        repo = new CommandInterpreter(timelines);
     }
 
     @Test
     public void userCanPostToTimelineAndEmptySetReturned() {
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
-        Deque<Chirp> chirps = repo.command(userName, TermChirp.POST_INPUT, message);
+        Collection<Chirp> chirps = repo.command(userName, TermChirp.POST_INPUT, message);
         verify(timelines).addToTimeline(userName, message);
         assertThat(chirps.size()).isEqualTo(0);
     }
@@ -54,11 +53,12 @@ public class MessageRepositoryTest {
 
     @Test
     public void userWallPostsAreInChronologicalOrder() {
+        String userName = userNameGenerator.next();
+        Generator<Deque<Chirp>> chirpStackGenerator = TermChirpRDG.generatorOfChronologicallyOrderedStackOfChirps(userName);
         Deque<Chirp> randomStackOfRandomChirps = chirpStackGenerator.next();
         given(timelines.getWallForUser(anyString()))
                 .willReturn(randomStackOfRandomChirps);
-        String userName = userNameGenerator.next();
-        Deque<Chirp> chirps = repo.command(userName, TermChirp.WALL_INPUT, null);
+        Collection<Chirp> chirps = repo.command(userName, TermChirp.WALL_INPUT, null);
 
         assertThat(chirps).isEqualTo(randomStackOfRandomChirps);
         assertThat(chirps.size()).isEqualTo(randomStackOfRandomChirps.size());
@@ -80,14 +80,15 @@ public class MessageRepositoryTest {
 
     @Test
     public void otherUserTimelinesAreInChronologicalOrder() {
-        Deque<Chirp> randomStackOfRandomChirps = chirpStackGenerator.next();
-        given(timelines.getTimelineForUser(anyString()))
-                .willReturn(randomStackOfRandomChirps);
         String userName = userNameGenerator.next();
-        Deque<Chirp> chirps = repo.command(userName, null, null);
+        Generator<Deque<Chirp>> chirpStackGenerator = TermChirpRDG.generatorOfChronologicallyOrderedStackOfChirps(userName);
+        Deque<Chirp> randomChirps = chirpStackGenerator.next();
+        given(timelines.getTimelineForUser(anyString()))
+                .willReturn(randomChirps);
+        Collection<Chirp> chirps = repo.command(userName, null, null);
 
-        assertThat(chirps).containsExactlyElementsOf(randomStackOfRandomChirps);
-        assertThat(chirps.size()).isEqualTo(randomStackOfRandomChirps.size());
+        assertThat(chirps).containsExactlyElementsOf(randomChirps);
+        assertThat(chirps.size()).isEqualTo(randomChirps.size());
         LocalDateTime earliest = LocalDateTime.now();
         for (Chirp chirp : chirps) {
             assertThat(chirp.getDateTime()).isBefore(earliest);

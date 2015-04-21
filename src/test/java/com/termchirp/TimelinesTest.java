@@ -19,14 +19,12 @@ public class TimelinesTest {
     LocalDateTime now = LocalDateTime.now();
 
     Clock clock;
-    ChirpGenerator chirpGenerator;
     Timelines timelines;
 
     @Before
     public void setupTimelines() {
         clock = new TestClock(now);
-        chirpGenerator = new ChirpGenerator(clock);
-        timelines = new Timelines(chirpGenerator);
+        timelines = new Timelines(clock);
     }
 
     @Test
@@ -58,11 +56,11 @@ public class TimelinesTest {
     @Test
     public void returnWallPosts() {
         String userName = userNameGenerator.next();
-        Deque<Chirp> chirps = TermChirpRDG.generatorOfStackOfChirps().next();
+        Deque<Chirp> chirps = TermChirpRDG.generatorOfChronologicallyOrderedStackOfChirps(userName).next();
         Map<String, Deque<Chirp>> existingChirps = new HashMap<>();
         existingChirps.put(userName, chirps);
-        timelines = new Timelines(chirpGenerator, existingChirps);
-        Deque<Chirp> wall = timelines.getWallForUser(userName);
+        timelines = new Timelines(clock, existingChirps);
+        Collection<Chirp> wall = timelines.getWallForUser(userName);
         assertThat(wall).containsExactlyElementsOf(chirps);
     }
 
@@ -70,15 +68,23 @@ public class TimelinesTest {
     public void followingUserShowsTheirChirpsOnWall() {
         String followingUser = userNameGenerator.next();
         String followedUser = userNameGenerator.next();
-        Deque<Chirp> followingUserChirps = TermChirpRDG.generatorOfStackOfChirps().next();
-        Deque<Chirp> followedUserChirps = TermChirpRDG.generatorOfStackOfChirps().next();
+        Deque<Chirp> followingUserChirps = TermChirpRDG.generatorOfChronologicallyOrderedStackOfChirps(followingUser).next();
+        Deque<Chirp> followedUserChirps = TermChirpRDG.generatorOfChronologicallyOrderedStackOfChirps(followedUser).next();
         Map<String, Deque<Chirp>> existingChirps = new HashMap<>();
         existingChirps.put(followingUser, followingUserChirps);
         existingChirps.put(followedUser, followedUserChirps);
-        timelines = new Timelines(chirpGenerator, existingChirps);
+        timelines = new Timelines(clock, existingChirps);
         timelines.follow(followingUser, followedUser);
-        Deque<Chirp> allChirps = timelines.getWallForUser(followingUser);
-        allChirps.addAll(timelines.getWallForUser(followedUser));
-        assertThat(allChirps).containsExactlyElementsOf(allChirps);
+        Collection<Chirp> wallChirps = timelines.getWallForUser(followingUser);
+        Collection<Chirp> allChirps = new ArrayList<>(followingUserChirps);
+        allChirps.addAll(followedUserChirps);
+        assertThat(wallChirps).containsAll(allChirps);
+        LocalDateTime earliest = LocalDateTime.now();
+        Iterator<Chirp> iter = wallChirps.iterator();
+        while (iter.hasNext()) {
+            Chirp chirp = iter.next();
+            assertThat(chirp.getDateTime()).isBefore(earliest);
+            earliest = chirp.getDateTime();
+        }
     }
 }

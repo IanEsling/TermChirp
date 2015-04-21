@@ -32,7 +32,7 @@ public class TermChirpTest {
     @Mock
     PrintStream output;
     @Mock
-    MessageRepository messageRepository;
+    CommandInterpreter commandInterpreter;
     @Mock
     PresentableChirps presentableChirps;
 
@@ -42,20 +42,19 @@ public class TermChirpTest {
         presentableOutput.add(PRESENTABLE_OUTPUT);
         given(presentableChirps.format(any(), anyString()))
                 .willReturn(presentableOutput.iterator());
-
     }
 
     @Test
     public void getPostCommand() {
         given(presentableChirps.format(any(), anyString()))
                 .willReturn(new ArrayList<String>().iterator());
-        given(messageRepository.command(anyString(), anyString(), anyString()))
+        given(commandInterpreter.command(anyString(), anyString(), anyString()))
                 .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
         InputStream input = getUserInputAsStream(userName, TermChirp.POST_INPUT, message);
-        new TermChirp(input, output, messageRepository, presentableChirps, 1d);
-        verify(messageRepository).command(userName, TermChirp.POST_INPUT, message);
+        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
+        verify(commandInterpreter).command(userName, TermChirp.POST_INPUT, message);
         verify(output, never()).println(anyString());
     }
 
@@ -63,42 +62,50 @@ public class TermChirpTest {
     public void getFollowsCommand() {
         given(presentableChirps.format(any(), anyString()))
                 .willReturn(new ArrayList<String>().iterator());
-        given(messageRepository.command(anyString(), anyString(), anyString()))
+        given(commandInterpreter.command(anyString(), anyString(), anyString()))
                 .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         String message = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, TermChirp.FOLLOWS_INPUT, message);
-        new TermChirp(input, output, messageRepository, presentableChirps, 1d);
-        verify(messageRepository).command(userName, TermChirp.FOLLOWS_INPUT, message);
+        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
+        verify(commandInterpreter).command(userName, TermChirp.FOLLOWS_INPUT, message);
         verify(output, never()).println(anyString());
     }
 
     @Test
     public void getWallCommand() {
-        Deque<Chirp> chirps = collectionOfChirps(Range.closed(10, 30));
-        given(messageRepository.command(anyString(), anyString(), anyString()))
-                .willReturn(chirps);
         String userName = userNameGenerator.next();
+        Deque<Chirp> chirps = collectionOfChirps(userName, Range.closed(10, 30));
+        given(commandInterpreter.command(anyString(), anyString(), anyString()))
+                .willReturn(chirps);
         InputStream input = getUserInputAsStream(userName, TermChirp.WALL_INPUT, null);
-        new TermChirp(input, output, messageRepository, presentableChirps, 1d);
-        verify(messageRepository).command(eq(userName), Matchers.eq(TermChirp.WALL_INPUT), isNull(String.class));
+        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
+        verify(commandInterpreter).command(eq(userName), Matchers.eq(TermChirp.WALL_INPUT), isNull(String.class));
         verify(output).println("Quack");
     }
 
     @Test
     public void getReadingCommand() {
-        Deque<Chirp> chirps = collectionOfChirps(Range.closed(10, 30));
-        given(messageRepository.command(anyString(), anyString(), anyString()))
-                .willReturn(chirps);
         String userName = userNameGenerator.next();
+        Deque<Chirp> chirps = collectionOfChirps(userName, Range.closed(10, 30));
+        given(commandInterpreter.command(anyString(), anyString(), anyString()))
+                .willReturn(chirps);
         InputStream input = getUserInputAsStream(userName, null, null);
-        new TermChirp(input, output, messageRepository, presentableChirps, 1d);
-        verify(messageRepository).command(eq(userName), isNull(String.class), isNull(String.class));
+        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
+        verify(commandInterpreter).command(eq(userName), isNull(String.class), isNull(String.class));
         verify(output).println(PRESENTABLE_OUTPUT);
     }
 
-    private Deque<Chirp> collectionOfChirps(Range<Integer> range) {
-        return TermChirpRDG.generatorOfStackOfChirps(range).next();
+    @Test
+    public void noExceptionOnEmptyLine(){
+        InputStream input = new ByteArrayInputStream(" ".getBytes());
+        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
+        verify(commandInterpreter, never()).command(anyString(), anyString(), anyString());
+        verify(output, never()).print(anyString());
+    }
+
+    private Deque<Chirp> collectionOfChirps(String userName, Range<Integer> range) {
+        return TermChirpRDG.generatorOfChronologicallyOrderedStackOfChirps(userName, range).next();
     }
 
     private InputStream getUserInputAsStream(String userName, String command, String message) {
