@@ -32,7 +32,7 @@ public class TermChirpTest {
     @Mock
     PrintStream output;
     @Mock
-    CommandInterpreter commandInterpreter;
+    CommandExecutor commandExecutor;
     @Mock
     PresentableChirps presentableChirps;
 
@@ -48,13 +48,13 @@ public class TermChirpTest {
     public void getPostCommand() {
         given(presentableChirps.format(any(), anyString()))
                 .willReturn(new ArrayList<String>().iterator());
-        given(commandInterpreter.command(anyString(), anyString(), anyString()))
+        given(commandExecutor.command(anyString(), anyString(), anyString()))
                 .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         String message = messageGenerator.next();
         InputStream input = getUserInputAsStream(userName, TermChirp.POST_INPUT, message);
-        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
-        verify(commandInterpreter).command(userName, TermChirp.POST_INPUT, message);
+        new TermChirp(input, output, commandExecutor, presentableChirps, 1d);
+        verify(commandExecutor).command(userName, TermChirp.POST_INPUT, message);
         verify(output, never()).println(anyString());
     }
 
@@ -62,13 +62,13 @@ public class TermChirpTest {
     public void getFollowsCommand() {
         given(presentableChirps.format(any(), anyString()))
                 .willReturn(new ArrayList<String>().iterator());
-        given(commandInterpreter.command(anyString(), anyString(), anyString()))
+        given(commandExecutor.command(anyString(), anyString(), anyString()))
                 .willReturn(emptyChirps);
         String userName = userNameGenerator.next();
         String message = userNameGenerator.next();
         InputStream input = getUserInputAsStream(userName, TermChirp.FOLLOWS_INPUT, message);
-        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
-        verify(commandInterpreter).command(userName, TermChirp.FOLLOWS_INPUT, message);
+        new TermChirp(input, output, commandExecutor, presentableChirps, 1d);
+        verify(commandExecutor).command(userName, TermChirp.FOLLOWS_INPUT, message);
         verify(output, never()).println(anyString());
     }
 
@@ -76,11 +76,11 @@ public class TermChirpTest {
     public void getWallCommand() {
         String userName = userNameGenerator.next();
         Deque<Chirp> chirps = collectionOfChirps(userName, Range.closed(10, 30));
-        given(commandInterpreter.command(anyString(), anyString(), anyString()))
+        given(commandExecutor.command(anyString(), anyString(), anyString()))
                 .willReturn(chirps);
         InputStream input = getUserInputAsStream(userName, TermChirp.WALL_INPUT, null);
-        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
-        verify(commandInterpreter).command(eq(userName), Matchers.eq(TermChirp.WALL_INPUT), isNull(String.class));
+        new TermChirp(input, output, commandExecutor, presentableChirps, 1d);
+        verify(commandExecutor).command(eq(userName), Matchers.eq(TermChirp.WALL_INPUT), isNull(String.class));
         verify(output).println("Quack");
     }
 
@@ -88,19 +88,19 @@ public class TermChirpTest {
     public void getReadingCommand() {
         String userName = userNameGenerator.next();
         Deque<Chirp> chirps = collectionOfChirps(userName, Range.closed(10, 30));
-        given(commandInterpreter.command(anyString(), anyString(), anyString()))
+        given(commandExecutor.command(anyString(), anyString(), anyString()))
                 .willReturn(chirps);
         InputStream input = getUserInputAsStream(userName, null, null);
-        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
-        verify(commandInterpreter).command(eq(userName), isNull(String.class), isNull(String.class));
+        new TermChirp(input, output, commandExecutor, presentableChirps, 1d);
+        verify(commandExecutor).command(eq(userName), isNull(String.class), isNull(String.class));
         verify(output).println(PRESENTABLE_OUTPUT);
     }
 
     @Test
     public void noExceptionOnEmptyLine(){
         InputStream input = new ByteArrayInputStream(" ".getBytes());
-        new TermChirp(input, output, commandInterpreter, presentableChirps, 1d);
-        verify(commandInterpreter, never()).command(anyString(), anyString(), anyString());
+        new TermChirp(input, output, commandExecutor, presentableChirps, 1d);
+        verify(commandExecutor, never()).command(anyString(), anyString(), anyString());
         verify(output, never()).print(anyString());
     }
 

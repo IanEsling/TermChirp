@@ -5,15 +5,15 @@ import java.util.LinkedList;
 
 import static com.termchirp.TermChirp.*;
 
-public class CommandInterpreter {
+public class CommandExecutor {
 
     private Timelines timelines;
 
-    public CommandInterpreter() {
+    public CommandExecutor() {
         this(new Timelines());
     }
 
-    public CommandInterpreter(Timelines timelines) {
+    public CommandExecutor(Timelines timelines) {
         this.timelines = timelines;
     }
 

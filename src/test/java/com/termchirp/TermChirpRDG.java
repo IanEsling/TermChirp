@@ -26,6 +26,7 @@ public class TermChirpRDG extends RDG {
 
         @Override
         public Deque<T> next() {
+            //should probably get Fyodor to do this kind of thing on its own
             List<T> list = listGeneratorOfT.next();
             Collections.sort(list);
             Collections.reverse(list);

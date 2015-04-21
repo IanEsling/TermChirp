@@ -21,16 +21,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CommandInterpreterTest {
+public class CommandExecutorTest {
 
     @Mock
     Timelines timelines;
 
-    CommandInterpreter repo;
+    CommandExecutor repo;
 
     @Before
     public void createRepo() {
-        repo = new CommandInterpreter(timelines);
+        repo = new CommandExecutor(timelines);
     }
 
     @Test

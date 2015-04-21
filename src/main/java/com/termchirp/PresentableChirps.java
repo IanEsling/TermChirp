@@ -9,6 +9,9 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 
+/*
+** handle all the formatting and wrangling needed to present chirps to the outside world.
+ */
 public class PresentableChirps {
 
     private Clock clock;
@@ -48,6 +51,11 @@ public class PresentableChirps {
                 prettyPrint(chirp.getDateTime()));
     }
 
+    /*
+    ** the prettyTime library handles this quite well but anything less than 5 minutes is described
+    ** as 'moments ago' so this adds a bit of granularity to the description of anything less than
+    ** 5 minutes ago.
+    */
     private String prettyPrint(LocalDateTime dateTime) {
         long diff = clock.now().toInstant(ZoneOffset.UTC).toEpochMilli() - dateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
         if (diff >= 1000 * 60 * 5) {

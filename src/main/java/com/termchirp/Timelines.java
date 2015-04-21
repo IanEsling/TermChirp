@@ -7,9 +7,11 @@ import java.util.*;
 
 public class Timelines {
 
-    private final Map<String, Collection<String>> follows;
-    private final Map<String, Deque<Chirp>> timelines;
     private final Clock clock;
+    //username mapped to all the users they follow
+    private final Map<String, Collection<String>> follows;
+    //use a stack (last in first out) to store user's chirps in the same order they want to see them
+    private final Map<String, Deque<Chirp>> timelines;
 
     public Timelines() {
         this(new LiveClock());
@@ -30,29 +32,32 @@ public class Timelines {
         if (timelines.containsKey(userName)) {
             timelines.get(userName).push(chirp);
         } else {
-            Deque<Chirp> messages = new ArrayDeque<>();
+            Deque<Chirp> messages = new LinkedList<>();
             messages.add(chirp);
             timelines.put(userName, messages);
         }
-        return new ArrayDeque<>();
+        return new LinkedList<>();
     }
 
     public Collection<Chirp> getTimelineForUser(String userName) {
-        if (timelines.containsKey(userName)) {
-            return timelines.get(userName);
+        Collection<Chirp> timeline = timelines.get(userName);
+        if (timeline == null) {
+            return new LinkedList<>();
         } else {
-            return new ArrayDeque<>();
+            return timeline;
         }
     }
 
     public Collection<Chirp> getWallForUser(String userName) {
         if (follows.containsKey(userName)) {
+            //use a treeset to sort all chirps from our user and the users they follow by date
             TreeSet<Chirp> wall = new TreeSet<>(getTimelineForUser(userName));
             for (String followedUser : follows.get(userName)) {
                 wall.addAll(getTimelineForUser(followedUser));
             }
             return wall;
         } else {
+            //if they're not following anyone their chirps are already in order
             return getTimelineForUser(userName);
         }
     }
@@ -65,6 +70,6 @@ public class Timelines {
             followedUsers.add(followedUser);
             follows.put(followingUser, followedUsers);
         }
-        return new ArrayDeque<>();
+        return new LinkedList<>();
     }
 }
