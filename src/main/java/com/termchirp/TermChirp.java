@@ -22,7 +22,6 @@ public class TermChirp {
                      PresentableChirps presentableChirps,
                      Double runTimes) {
         Scanner scanner = new Scanner(input);
-
         int runs = 0;
         while (runTimes == Double.POSITIVE_INFINITY || runs < runTimes) {
             String[] command = getInput(scanner);
@@ -34,6 +33,20 @@ public class TermChirp {
                     output.println(formattedChirps.next());
             }
         }
+    }
+
+    private static void printWelcome(PrintStream output) {
+        output.println(" _    _      _                            _          _____                   _____ _     _            \n" +
+                "| |  | |    | |                          | |        |_   _|                 /  __ \\ |   (_)           \n" +
+                "| |  | | ___| | ___ ___  _ __ ___   ___  | |_ ___     | | ___ _ __ _ __ ___ | /  \\/ |__  _ _ __ _ __  \n" +
+                "| |/\\| |/ _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\ | __/ _ \\    | |/ _ \\ '__| '_ ` _ \\| |   | '_ \\| | '__| '_ \\ \n" +
+                "\\  /\\  /  __/ | (_| (_) | | | | | |  __/ | || (_) |   | |  __/ |  | | | | | | \\__/\\ | | | | |  | |_) |\n" +
+                " \\/  \\/ \\___|_|\\___\\___/|_| |_| |_|\\___|  \\__\\___/    \\_/\\___|_|  |_| |_| |_|\\____/_| |_|_|_|  | .__/ \n" +
+                "                                                                                               | |    \n" +
+                "                                                                                               |_|    ");
+        output.println();
+        output.println("USAGE: username [->|follows|wall] [message|username]");
+        output.println();
     }
 
     private String[] getInput(Scanner scanner) {
@@ -56,6 +69,7 @@ public class TermChirp {
     }
 
     public static void main(String... args) {
+        printWelcome(System.out);
         new TermChirp(System.in, System.out);
     }
 }
