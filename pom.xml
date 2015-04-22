@@ -7,6 +7,10 @@
     <groupId>ian.esling</groupId>
     <artifactId>TermChirp</artifactId>
     <version>0.1</version>
+
+    <properties>
+            <jdk.version>1.8</jdk.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.ocpsoft.prettytime</groupId>
@@ -53,6 +57,15 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
