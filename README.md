@@ -1,5 +1,5 @@
 # TermChirp
-a twitterlike in a terminal
+a Java 8 twitterlike in a terminal
 
 #Running
 TermChirp can be run with the executable JAR file in the root:
